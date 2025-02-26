@@ -1,0 +1,10 @@
+$(document).ready(function(){i(),$("#medicine-name").select2({placeholder:"Select a medicine",allowClear:!0}),$("#add-medicine").click(function(){window.location.href="/create/medicine"}),$(document).on("click",".delete-button",function(a){a.preventDefault();var t=$(this).closest("form");Swal.fire({title:"Are you sure?",text:"You won't be able to revert this!",icon:"warning",showCancelButton:!0,confirmButtonText:"Yes, delete it!",cancelButtonText:"Cancel",customClass:{confirmButton:"btn btn-primary me-2 waves-effect waves-light",cancelButton:"btn btn-label-secondary waves-effect waves-light"},buttonsStyling:!1}).then(function(n){n.isConfirmed&&t.submit()})}),$("#apply-filters").click(function(){i()}),$("#reset-filters").click(function(){$("#medicine-name").val(""),i()});function i(){var a=$("#medicine-name").val();$.ajax({url:"/getFilteredMedicineData",type:"get",dataType:"json",data:{name:a},success:function(t){var n=[];$.each(t,function(l,e){var c=`
+                        <a href="/edit/medicine/${e.id}" class="btn btn-sm btn-primary">Edit</a>
+                    `;e.canDelete||(c+=`
+                            <form action="${baseUrl}delete/medicine/${e.id}" method="POST" style="display:inline;">
+                                <input type="hidden" name="_method" value="DELETE">
+                                <input type="hidden" name="_token" value="${csrfToken}">
+                                <button type="button" class="btn btn-sm btn-icon delete-button" data-id="${e.id}">
+                                    <i class="ti ti-trash"></i> <!-- Delete icon -->
+                                </button>
+                            </form>`),n.push([e.id,e.name,e.dose,e.frequency,c])});var o=$(".datatables-medicines").DataTable();o.destroy(),$(".datatables-medicines").DataTable({aaSorting:[],data:n,columnDefs:[{className:"text-nowrap text-left",targets:[0,1,2,3,4]}],drawCallback:function(l){feather.replace(),$('[data-toggle="tooltip"]').tooltip()}})},error:function(t){console.log("AJAX request failed."),console.log(t)}})}});
